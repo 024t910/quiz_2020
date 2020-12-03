@@ -1,0 +1,169 @@
+body {
+  //overflow:hidden;
+  margin:0;
+  padding:0;
+}
+video{
+  position:absolute;
+  top:0;
+  left:0;
+  width:90%;
+  z-index:1;
+  padding:5%;
+  -webkit-transform: scaleX(-1);
+}
+
+img{
+  width: 100%;
+}
+
+#container{
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: #153e3f center / cover;
+  z-index:0;
+}
+.f{
+  position: absolute;;
+  z-index:5;
+  width:100px;
+  height:40px;
+}
+.f img{
+  margin,padding: 0;
+  width: 100%;
+  height:100%
+}
+.frame-t{
+  top:0;
+  height:9.6%;
+}
+.frame-r{
+  right:0;
+}
+.frame-l{
+  left:0;
+}
+.frame-b{
+  bottom:0;
+  height:9.6%;
+}
+.f06,.f01{
+  width: 26%;
+  left:50%;
+}
+.f07,.f12{
+  right:50%;
+  width: 26%;
+}
+.f05,.f02{
+  width: 26%;
+}
+.f08,.f11{
+  width: 26%;
+}
+.f03,.f04,.f09,.f10{
+  height:50%;
+  width:5.7%;
+}
+.grow{
+  position: absolute;
+  top:9.2%;
+  left:5.5%;
+  width: 88.6%;
+  height: 80.8%;
+  border-image-source: url(img/frame_grow_9s.png);
+  border-image-slice: 10;
+  border-image-width: 10px;
+  border-image-repeat: round;
+  border-style: solid;
+  z-index:2;
+}
+.title{
+  position: absolute;
+  left:40%;
+  width:20%;
+  z-index:15;
+}
+.title img{
+  width:100%;
+}
+
+.qa{
+  position: absolute;
+  top:75%;
+  left:10%;
+  width:80%;
+  height:20%;
+  z-index:11;
+}
+
+.qa img,.qa-t img{
+  width:100%;
+  height:100%;
+}
+
+.qa-t{
+  position: absolute;
+  top:71.5%;
+  left:45.5%;
+  width:9vw;
+  height:4vw;
+  z-index:15;
+}
+
+#atxt{
+  position:absolute;
+  left:10%;
+  width:80%;
+  top:73%;
+  font-size: 4vw;
+  z-index:13;
+  font-weight: 900;
+  text-align: center;
+}
+
+#qtxt{
+  position:absolute;
+  left:17%;
+  width:66%;
+  top:75%;
+  font-size: 1.8vw;
+  z-index:13;
+  font-weight: 900;
+  text-align: left;
+}
+
+#title_txt p{
+  text-align: center;
+  font-weight: bold;
+  color:#FFFFFF;
+  font-size:1.2vw;
+  text-shadow: 0px 0px 0.2vw #222222;
+  opacity: 0.9;
+}
+
+#title_txt{
+  position: absolute;;
+  background-image: url("img/title_img.png");
+  left:10%;
+  top:20%;
+  width:80%;
+  height:60%;
+  background-size:contain;
+  background-repeat: no-repeat;
+  padding-top:10%;
+}
+
+#startbtn{
+  position: absolute;
+  right:35%;
+  width:30%;
+  top:70%;
+  z-index:15;
+}
+
+small{
+  font-size:0.8vw;
+}

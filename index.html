@@ -1,0 +1,225 @@
+<html class="no-js consumer" lang="en">
+<head>
+  <title>テスト</title>
+  <script src="https://code.jquery.com/jquery-3.x-git.slim.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+  </style>
+</head>
+<body>
+  <div id="container">
+    <video id="player" autoplay></video>
+    <div class="f01 frame-t f"><img src="img/frame_01.png"/></div>
+    <div class="f02 frame-t frame-r f"><img src="img/frame_02.png"/></div>
+    <div class="f03 frame-t frame-r f"><img src="img/frame_03.png"/></div>
+    <div class="f04 frame-b frame-r f"><img src="img/frame_04.png"/></div>
+    <div class="f05 frame-b frame-r f"><img src="img/frame_05.png"/></div>
+    <div class="f06 frame-b f"><img src="img/frame_06.png"/></div>
+    <div class="f07 frame-b f"><img src="img/frame_07.png"/></div>
+    <div class="f08 frame-b frame-l f"><img src="img/frame_08.png"/></div>
+    <div class="f09 frame-b frame-l f"><img src="img/frame_09.png"/></div>
+    <div class="f10 frame-t frame-l f"><img src="img/frame_10.png"/></div>
+    <div class="f11 frame-t frame-l f"><img src="img/frame_11.png"/></div>
+    <div class="f12 frame-t f"><img src="img/frame_12.png"/></div>
+    <div class="grow"></div>
+    <div class="title"><img src="img/title.png"/></div>
+
+    <div id="qf" class="qa q"><img src="img/question_bg.png"></div>
+    <div id="qt" class="qa-t q"><img src="img/question_title.png"></div>
+    <div id="af" class="qa a"><img src="img/answer_bg.png"></div>
+    <div id="at" class="qa-t a"><img src="img/answer_title.png"></div>
+    <p id="atxt">こたえ</p>
+    <p id="qtxt">こたえ</p>
+    <div id="title_txt">
+    <p>本作はアプリケーションと音声認識システムとユーザーとが<br/>歩み寄ることで成立するクイズコンテンツです</p>
+    <p>三者それぞれが、インターフェース上に発生する<br/>入出力コミュニケーションを無条件に受け容れるという姿勢を持つことで<br/>コンテンツの体験サイクルを循環させることができます</p>
+    <p><small>※ Chrome(Windows/Mac)のみ対応です</small></p>
+    </div>
+    <div id="startbtn" onClick=start()><img src="img/start_btn.png"/></div>
+  </div>
+
+
+  <div class="full"></div>
+  <br/><br/><br/><br/><br/><br/><br/>
+  <button id="start-btn">start</button>
+  <button id="stop-btn">stop</button>
+  <div id="result-div"></div>
+  <div class="time01"></div>
+  <audio id="correct" preload>
+    <source src="sound/correct2.mp3" type="audio/mp3">
+  </audio>
+  <audio id="question" preload>
+    <source src="sound/question1.mp3" type="audio/mp3">
+  </audio>
+  <audio id="timer" preload loop autoplay>
+    <source src="sound/quiz-timer1.mp3" type="audio/mp3">
+  </audio>
+  <p id="log">テスト</p>
+<script>
+    const startBtn = document.querySelector('#start-btn');
+    const stopBtn = document.querySelector('#stop-btn');
+    const resultDiv = document.querySelector('#result-div');
+
+    SpeechRecognition = webkitSpeechRecognition || SpeechRecognition;
+    let recognition = new SpeechRecognition();
+
+    recognition.lang = 'ja-JP';
+    recognition.interimResults = true;
+    recognition.continuous = true;
+
+    let finalTranscript = ''; // 確定した(黒の)認識結果
+
+    recognition.onresult = (event) => {
+      let interimTranscript = ''; // 暫定(灰色)の認識結果
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        let transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+          if(qf.style.visibility == "visible"){
+            a_txt.innerHTML = transcript;
+            showAnser();
+          }
+        } else {
+          interimTranscript = transcript;
+        }
+      }
+      resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
+    }
+
+    startBtn.onclick = () => {
+      recognition.start();
+    }
+    stopBtn.onclick = () => {
+      recognition.stop();
+    }
+    let player = document.getElementById('player');
+    player.style.opacity = 0;
+    let handleSuccess = function(stream) {
+      player.srcObject = stream;
+      let currentTrack;
+      stream.getVideoTracks().forEach(track => {
+        if (track.readyState == 'live') {
+          currentTrack = track;
+          return;
+        }
+      });
+
+      startScan((scanResult) => {
+      });
+    };
+
+    navigator.mediaDevices.getUserMedia({
+      video: {facingMode: "environment"},
+      audio: false
+    }).then(handleSuccess)
+    .catch(err => {
+  	  console.log(JSON.stringify(err));
+    });
+
+    const qf = document.getElementById("qf");
+    const qt = document.getElementById("qt");
+    const af = document.getElementById("af");
+    const at = document.getElementById("at");
+
+    const ase = document.getElementById("correct");
+    const qse = document.getElementById("question");
+    const tse = document.getElementById("timer");
+
+    const a_txt = document.getElementById("atxt");
+    const q_txt = document.getElementById("qtxt");
+
+    const t_txt = document.getElementById("title_txt");
+    const start_btn = document.getElementById("startbtn");
+
+    var q_str = "";
+
+    var qindex = 0;
+    var qtimer;
+
+    function showQuestion(){
+      af.style.visibility ="hidden";
+      at.style.visibility ="hidden";
+      a_txt.style.visibility = "hidden";
+      qf.style.visibility ="visible";
+      qt.style.visibility ="visible";
+      q_txt.style.visibility = "visible";
+      q_txt.innerHTML = "";
+      q_str = q[Math.floor(Math.random() * q.length)]
+      qindex = 0;
+      qtimer = setInterval(showQText,150);
+      qse.play();
+      tse.play();
+    }
+    function showQText(){
+      var next_q = q_str.substr(0,qindex);
+      next_q = next_q.replaceAll("¥","<br/>");
+      q_txt.innerHTML = next_q;
+      qindex++;
+    }
+
+    var atimer;
+
+    function showAnser(){
+      qf.style.visibility ="hidden";
+      qt.style.visibility ="hidden";
+      q_txt.style.visibility = "hidden";
+      af.style.visibility ="visible";
+      at.style.visibility ="visible";
+      a_txt.style.visibility = "visible";
+      atimer = setTimeout(showQuestion, 3000);
+      ase.play();
+    }
+    //showQuestion();
+    recognition.start();
+
+    qf.style.visibility ="hidden";
+    qt.style.visibility ="hidden";
+    q_txt.style.visibility = "hidden";
+    af.style.visibility ="hidden";
+    at.style.visibility ="hidden";
+    a_txt.style.visibility = "hidden";
+
+    function start(){
+      t_txt.style.visibility = "hidden";
+      start_btn.style.visibility = "hidden";
+      player.style.opacity = 1;
+      showQuestion();
+    }
+
+    const q = [
+      "マザーテレサの名言「神様は私たちに成功してほしいなんて思っていません。ただ、■■■■■■■を望んでいるだけよ。」。■■■■■■■に入る言葉は？",
+      "左から緑、白、黄色の順に色が並ぶ国旗はアイルランド。¥では、左から黄色、白、緑に並ぶ国旗は¥どこの国？",
+      "童謡「チューリップ」の１番の始まりは さいた さいた¥では、３番の始まりは？",
+      "料理で使われる「サラダ油」¥このサラダの由来は？",
+      "童謡「アルプスいちまんじゃく」¥歌詞の中にラは何回出てくる？",
+      "童謡「一年生になったら」¥1番の歌詞でしたいことは富士山の上でおにぎりを食べたい¥2番でしたいことは何？",
+      "童謡「一番星みつけた」 一番星を見つけたのは杉の木の上¥では、二番星を見つけたのはどこ？",
+      "童謡「浦島太郎」では最後に浦島太郎は玉手箱をあけてしまいます。¥では、なぜあけたでしょう？",
+      "絵描き歌「ぼうがいっぽんあったとさ」¥最終的にできるのは何の絵？",
+      "童謡「めだがの学校」 めだかが泳ぐ姿をどんな擬音語で表している？",
+      "童謡「メリーさんのひつじ」 最終的にメリーさんはどうなった？",
+      "童謡「やまぐちさんちのツトムくん」 田舎へ行ってたママが持って帰ってきたお土産は？",
+      "「安心、それが人間の最も近くにいる敵である」¥これは誰の名言？",
+      "世界三大河川 アマゾン川、ナイル川¥あとひとつは？",
+      "世界三大夜景 ナポリ、香港¥あとひとつは？",
+      "世界三大建築 パルテノン神殿、ローマのパンテオン¥あとひとつは？",
+      "世界三大カーニバル リオ、ベネチア¥あとひとつは？",
+      "世界三大がっかり マーライオン、小便小僧¥あとひとつは？",,
+      "ラーメンの湯切りの際に使う細長いザル¥正式名称を何と言う？",
+      "耳かきの先端についているふわふわの部分¥この正式名称は何？",
+      "オーバーオールやワークパンツなどの横についている輪っかの部分¥もともと何のためについている？",
+      "お店でお会計の際に現金やカードを置くトレイの正式名称は？",
+      "駄菓子屋さんで見かけるまあるいかたちをした球状の瓶¥正式名称を何と言う?",
+      "&マークの正式な呼び方は？",
+      "西部劇でカウボーイが履くブーツについているギザギザの円盤¥何のためにつかうもの？",
+      "シベリア原住民が用いていた長さを表す単位「ブーク」¥1ブークは何を見分けられる距離のこと？",
+      "ウニを数えるときに使用する単位は？",
+      "昆布を数えるときに使用する単位は？",
+      "砲台を数えるときに使用する単位は？",
+      "人間の未来はどうなるかわからないという意味の故事成語「人間万事塞翁が馬」¥馬が帰ってきたおかげで塞翁はどうなった？",
+      "人から金銭を脅しとることを指す言葉「カツアゲ」¥カツは何の略？",
+      "チケットの転売を生業とする「ダフ屋」¥ダフの由来は？",
+      "中国戦国時代の古事成語「漁夫の利」¥漁師が得たものは何と何？",
+      "お金をこっそり貯め込むことを意味する言葉「へそくり」¥へそはもともと何のこと？",
+    ];
+  </script>
+</body>
