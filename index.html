@@ -106,12 +106,31 @@
       qse.play();
       tse.play();
       recognition.start();
+
+      timeoutHandler = setTimeout(timeOutHandler,30000);
     }
     function showQText(){
       var next_q = q_str.substr(0,qindex);
       next_q　= next_q.replace(/¥/g, '<br/>');
       q_txt.innerHTML = next_q;
       qindex++;
+    }
+
+    function timeOutHandler(){
+
+      qf.style.visibility ="hidden";
+      qt.style.visibility ="hidden";
+      q_txt.style.visibility = "hidden";
+      af.style.visibility ="hidden";
+      at.style.visibility ="hidden";
+      a_txt.style.visibility = "hidden";
+
+      t_txt.style.visibility = "visible";
+      start_btn.style.visibility = "visible";
+      player.style.opacity = 0;
+
+      tse.pause();
+      recognition.abort();
     }
 
     var atimer;
@@ -126,6 +145,7 @@
       atimer = setTimeout(showQuestion, 3000);
       ase.play();
       recognition.abort();
+      clearTimeout(timeout);
     }
 
     qf.style.visibility ="hidden";
