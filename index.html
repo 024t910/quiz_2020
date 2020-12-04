@@ -151,7 +151,7 @@
     }
     function showQText(){
       var next_q = q_str.substr(0,qindex);
-      next_q = next_q.replaceAll("¥","<br/>");
+      next_q　= next_q.replace(/¥/g, '<br/>');
       q_txt.innerHTML = next_q;
       qindex++;
     }
