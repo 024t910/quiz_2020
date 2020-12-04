@@ -1,7 +1,7 @@
-<html class="no-js consumer" lang="en">
+<html lang="ja" data-form-id="">
 <head>
-  <title>テスト</title>
-  <script src="https://code.jquery.com/jquery-3.x-git.slim.min.js"></script>
+  <title>QUIZ ウケイレロ</title>
+  <meta charset="utf-8">
   <link rel="stylesheet" href="styles.css">
   </style>
 </head>
@@ -36,61 +36,16 @@
     </div>
     <div id="startbtn" onClick=start()><img src="img/start_btn.png"/></div>
   </div>
-
-
-  <div class="full"></div>
-  <br/><br/><br/><br/><br/><br/><br/>
-  <button id="start-btn">start</button>
-  <button id="stop-btn">stop</button>
-  <div id="result-div"></div>
-  <div class="time01"></div>
   <audio id="correct" preload>
     <source src="sound/correct2.mp3" type="audio/mp3">
   </audio>
   <audio id="question" preload>
     <source src="sound/question1.mp3" type="audio/mp3">
   </audio>
-  <audio id="timer" preload loop autoplay>
+  <audio id="timer" preload loop>
     <source src="sound/quiz-timer1.mp3" type="audio/mp3">
   </audio>
-  <p id="log">テスト</p>
 <script>
-    const startBtn = document.querySelector('#start-btn');
-    const stopBtn = document.querySelector('#stop-btn');
-    const resultDiv = document.querySelector('#result-div');
-
-    SpeechRecognition = webkitSpeechRecognition || SpeechRecognition;
-    let recognition = new SpeechRecognition();
-
-    recognition.lang = 'ja-JP';
-    recognition.interimResults = true;
-    recognition.continuous = true;
-
-    let finalTranscript = ''; // 確定した(黒の)認識結果
-
-    recognition.onresult = (event) => {
-      let interimTranscript = ''; // 暫定(灰色)の認識結果
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        let transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalTranscript += transcript;
-          if(qf.style.visibility == "visible"){
-            a_txt.innerHTML = transcript;
-            showAnser();
-          }
-        } else {
-          interimTranscript = transcript;
-        }
-      }
-      resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
-    }
-
-    startBtn.onclick = () => {
-      recognition.start();
-    }
-    stopBtn.onclick = () => {
-      recognition.stop();
-    }
     let player = document.getElementById('player');
     player.style.opacity = 0;
     let handleSuccess = function(stream) {
@@ -135,6 +90,8 @@
     var qindex = 0;
     var qtimer;
 
+    var timeOut;
+
     function showQuestion(){
       af.style.visibility ="hidden";
       at.style.visibility ="hidden";
@@ -148,6 +105,7 @@
       qtimer = setInterval(showQText,150);
       qse.play();
       tse.play();
+      recognition.start();
     }
     function showQText(){
       var next_q = q_str.substr(0,qindex);
@@ -167,9 +125,8 @@
       a_txt.style.visibility = "visible";
       atimer = setTimeout(showQuestion, 3000);
       ase.play();
+      recognition.abort();
     }
-    //showQuestion();
-    recognition.start();
 
     qf.style.visibility ="hidden";
     qt.style.visibility ="hidden";
@@ -183,11 +140,12 @@
       start_btn.style.visibility = "hidden";
       player.style.opacity = 1;
       showQuestion();
+      tse.play();
     }
 
     const q = [
       "マザーテレサの名言「神様は私たちに成功してほしいなんて思っていません。ただ、■■■■■■■を望んでいるだけよ。」。■■■■■■■に入る言葉は？",
-      "左から緑、白、黄色の順に色が並ぶ国旗はアイルランド。¥では、左から黄色、白、緑に並ぶ国旗は¥どこの国？",
+      "左から緑、白、黄色の順に色が並ぶ国旗はアイルランド。¥では、左から黄色、白、緑に並ぶ国旗はどこの国？",
       "童謡「チューリップ」の１番の始まりは さいた さいた¥では、３番の始まりは？",
       "料理で使われる「サラダ油」¥このサラダの由来は？",
       "童謡「アルプスいちまんじゃく」¥歌詞の中にラは何回出てくる？",
@@ -197,7 +155,7 @@
       "絵描き歌「ぼうがいっぽんあったとさ」¥最終的にできるのは何の絵？",
       "童謡「めだがの学校」 めだかが泳ぐ姿をどんな擬音語で表している？",
       "童謡「メリーさんのひつじ」 最終的にメリーさんはどうなった？",
-      "童謡「やまぐちさんちのツトムくん」 田舎へ行ってたママが持って帰ってきたお土産は？",
+      "童謡「やまぐちさんちのツトムくん」¥田舎へ行ってたママが持って帰ってきたお土産は？",
       "「安心、それが人間の最も近くにいる敵である」¥これは誰の名言？",
       "世界三大河川 アマゾン川、ナイル川¥あとひとつは？",
       "世界三大夜景 ナポリ、香港¥あとひとつは？",
@@ -221,5 +179,36 @@
       "中国戦国時代の古事成語「漁夫の利」¥漁師が得たものは何と何？",
       "お金をこっそり貯め込むことを意味する言葉「へそくり」¥へそはもともと何のこと？",
     ];
+
+    var recognition;
+    try{
+      SpeechRecognition = webkitSpeechRecognition || SpeechRecognition;
+      recognition = new SpeechRecognition();
+
+      recognition.lang = 'ja-JP';
+      recognition.interimResults = true;
+      recognition.continuous = true;
+
+      let finalTranscript = '';
+
+      recognition.onresult = (event) => {
+        let interimTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          let transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript;
+            if(qf.style.visibility == "visible"){
+              a_txt.innerHTML = transcript;
+              showAnser();
+            }
+          } else {
+            interimTranscript = transcript;
+          }
+        }
+        //resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
+      }
+    }catch(error){
+
+    }
   </script>
 </body>
