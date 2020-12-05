@@ -107,7 +107,7 @@
       tse.play();
       recognition.start();
 
-      timeoutHandler = setTimeout(timeOutHandler,30000);
+      timeOut = setTimeout(timeOutHandler,30000);
     }
     function showQText(){
       var next_q = q_str.substr(0,qindex);
@@ -145,7 +145,8 @@
       atimer = setTimeout(showQuestion, 3000);
       ase.play();
       recognition.abort();
-      clearTimeout(timeout);
+      clearTimeout(timeOut);
+      clearInterval(qtimer);
     }
 
     qf.style.visibility ="hidden";
